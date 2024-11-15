@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <stdio.h>
+#include <string.h>
 #include <fcntl.h>
 #include "get_next_line.h"
 
@@ -43,14 +44,17 @@ static size_t	ft_slen(char const *s)
 	return (i);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *s1, char const *s2, int new_line)
 {
 	char	*ptr;
 	size_t	s1_len;
 	size_t	s2_len;
 
+    if (new_line != -1)
+        s2_len = new_line;
+    else
+	    s2_len = ft_slen(s2);
 	s1_len = ft_slen(s1);
-	s2_len = ft_slen(s2);
 	ptr = (char *) malloc((s1_len + s2_len) + 1);
 	if (ptr == NULL)
 		return (NULL);
@@ -61,7 +65,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 }
 
 /// ////////////////
-int get_len(char *buffer)
+int check_newline(char *buffer)
 {
     int i;
 
@@ -72,24 +76,27 @@ int get_len(char *buffer)
             return (++i);
         i++;
     }
-    return (i);
+    return (-1);
 }
-char *allocate_line(char *buffer, int len)
-{
-    int i;
-    char *ptr;
 
-    ptr = (char *) malloc(len + 1);
-    if (!ptr)
-        return (NULL);
-    i = 0;
-    while (buffer[i] && i < len)
-    {
-        ptr[i] = buffer[i];
-        i++;
-    }
-    ptr[i] = '\0';
-    return (ptr);
+char	*ft_strdup(const char *s1)
+{
+	char	*ptr;
+	size_t	i;
+    size_t s_len;
+
+	i = 0;
+    s_len = strlen(s1);
+	ptr = (char *) malloc(s_len + 1);
+	if (ptr == NULL)
+		return (NULL);
+	while (i < s_len)
+	{
+		ptr[i] = s1[i];
+		i++;
+	}
+	ptr[s_len] = '\0';
+	return (ptr);
 }
 
 char *read_data(int fd)
@@ -107,19 +114,23 @@ char *read_data(int fd)
 char *get_next_line(int fd)
 {
     char *ptr;
-    static int i;
+    char *temp;
+    // static int i;
+    int is_newline;
     
     ptr = read_data(fd);
-    while (ptr[i])
+    if (!ptr)
+        return (NULL);
+    is_newline = check_newline(ptr);
+    if (is_newline != -1)
+        return (ft_strdup(ptr));
+    while (is_newline == -1)
     {
-        if (ptr[i] == '\n')
-            return (allocate_line(ptr, ++i));
-        i++;
+        temp = ft_strdup(ptr);
+        ptr = read_data(fd);
+        is_newline = check_newline(ptr);
+        ptr = ft_strjoin(temp, ptr, is_newline);
     }
-    
-
-    
-    
 
     return (ptr);
 }
@@ -131,8 +142,8 @@ int main()
     int fd = open("tst.txt", O_RDONLY);
     
     printf("[%s]\n", get_next_line(fd));
-    // printf("[%s]\n", get_next_line(fd));
-    // printf("[%s]\n", get_next_line(fd));
+    printf("[%s]\n", get_next_line(fd));
+    printf("[%s]\n", get_next_line(fd));
     // printf("[%s]", get_next_line(fd));
 
     // printf("%s", read_data(fd));
