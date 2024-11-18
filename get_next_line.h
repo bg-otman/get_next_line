@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 6
+# define BUFFER_SIZE 600
 #endif
 
 

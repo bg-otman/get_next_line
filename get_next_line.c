@@ -52,6 +52,7 @@ ssize_t read_data(int fd, char *buffer)
 {
     ssize_t bytes_read;
 
+    memset(buffer, 0, BUFFER_SIZE + 1);
     bytes_read = read(fd, buffer, BUFFER_SIZE);
     return (bytes_read);
 }
@@ -59,14 +60,13 @@ ssize_t read_data(int fd, char *buffer)
 char *get_next_line(int fd)
 {
     char buffer[BUFFER_SIZE + 1];
-    int is_newline;
     char *line;
     static char *left_buffer;
     char *temp;
-    int bytes_read;
-    
+    ssize_t bytes_read;
+
     bytes_read = read_data(fd, buffer);
-    if (bytes_read < 0 || (bytes_read == 0 && left_buffer == NULL))
+    if (bytes_read < 0 || (bytes_read == 0 && !left_buffer))
             return (NULL);
     
     if (left_buffer && bytes_read == 0 && check_newline(left_buffer) == -1)
@@ -75,15 +75,21 @@ char *get_next_line(int fd)
         if (!line)
             return (NULL);
         free(left_buffer);
+        left_buffer = NULL;
         return (line);
     }
 
-    if (buffer[0])
+    if (bytes_read > 0)
+    {
+        temp = left_buffer;
         left_buffer = ft_strjoin(left_buffer, buffer);
-    // printf("%s\n", left_buffer);
+        free(temp);
+        temp = NULL;
+    }
+
     if (check_newline(left_buffer) != -1)
     {
-        // printf("hi\n");
+        
         line = allocate_line(left_buffer);
         if (!line)
             return (NULL);
@@ -92,13 +98,19 @@ char *get_next_line(int fd)
             return (NULL);
         free(left_buffer);
         left_buffer = temp;
+        return (line);
     }
     while (check_newline(left_buffer) == -1)
     {
         bytes_read = read_data(fd, buffer);
         if (bytes_read > 0)
         {
+            ///
+            temp = left_buffer;
             left_buffer = ft_strjoin(left_buffer, buffer);
+            free(temp);
+            temp = NULL;
+            ///
             if (check_newline(left_buffer) != -1)
             {
                 line = allocate_line(left_buffer);
@@ -111,35 +123,39 @@ char *get_next_line(int fd)
                 left_buffer = temp;
                 return (line);
             }
-        } else
-            return (NULL);
+        }
+        if (left_buffer && bytes_read == 0)
+        {
+            line = ft_strdup(left_buffer);
+            if (!line)
+                return (NULL);    
+            free(left_buffer);
+            left_buffer = NULL;
+            return (line);
+        }
     }
-    // printf("*   \n");
 
     return (line);
 }
 
 
-
-int main()
+int main(void)
 {
     int fd = open("tst.txt", O_RDONLY);
-    
-    char *ptr1 = get_next_line(fd);
-    char *ptr2 = get_next_line(fd);
-    char *ptr3 = get_next_line(fd);
-    char *ptr4 = get_next_line(fd);
+    char *line;
 
-    printf("[%s]\n", ptr1);
-    printf("[%s]\n", ptr2);
-    printf("[%s]\n", ptr3);
-    printf("[%s]\n", ptr4);
+    if (fd == -1)
+    {
+        printf("Error opening file");
+        return (1);
+    }
 
-    free(ptr1);
-    free(ptr2);
-    free(ptr3);
-    free(ptr4);
-    
+    while ((line = get_next_line(fd)) != NULL)
+    {
+        printf("%s", line);
+        free(line);
+    }
+
     close(fd);
-    return 0;
+    return (0);
 }

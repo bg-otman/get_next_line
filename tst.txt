@@ -1,3 +1,7 @@
-Hello world hi
-welcome again here
-1337
+Hello, this is the first line.
+This is the second line of the file.
+The third line is here.
+
+This is the fifth line, with a newline before it.
+Last line, no newline at the end
+
