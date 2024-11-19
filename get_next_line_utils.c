@@ -65,3 +65,59 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	ptr[s1_len + s2_len] = '\0';
 	return (ptr);
 }
+
+int check_newline(char *buffer)
+{
+    int i;
+
+    i = 0;
+    while (buffer[i])
+    {
+        if (buffer[i] == '\n')
+            return (++i);
+        i++;
+    }
+    return (-1);
+}
+
+char *allocate_line(char *buffer)
+{
+    int len;
+    int i;
+    char *ptr;
+
+	if (!buffer)
+		return (NULL);
+    len = check_newline(buffer);
+	if (len == -1)
+		len = ft_slen(buffer);
+    i = 0;
+	ptr = (char *) malloc(len + 1);
+	if (!ptr)
+		return (NULL);
+	while (i < len)
+	{
+		ptr[i] = buffer[i];
+		i++;
+	}
+	ptr[i] = '\0';
+	return (ptr);
+}
+
+ssize_t read_data(int fd, char **buffer)
+{
+    ssize_t bytes_read;
+	*buffer = (char *) malloc(BUFFER_SIZE + 1);
+	if (!*buffer)
+		return (-1);
+    bytes_read = read(fd, *buffer, BUFFER_SIZE);
+	if (bytes_read == -1)
+	{
+		free(*buffer);
+		*buffer = NULL;
+		return (bytes_read);
+	}
+	(*buffer)[bytes_read] = '\0';
+
+    return (bytes_read);
+}

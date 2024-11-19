@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 600
+# define BUFFER_SIZE 20
 #endif
 
 
@@ -16,5 +16,8 @@ char *get_next_line(int fd);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strdup(const char *s1);
 size_t	ft_slen(char const *s);
+char *allocate_line(char *buffer);
+int check_newline(char *buffer);
+ssize_t read_data(int fd, char **buffer);
 
 # endif

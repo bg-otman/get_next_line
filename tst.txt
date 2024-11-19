@@ -1,7 +1,10 @@
-Hello, this is the first line.
-This is the second line of the file.
-The third line is here.
+Hello, world!
+This is a test file.
+It contains multiple lines of text.
 
-This is the fifth line, with a newline before it.
-Last line, no newline at the end
+Some lines are empty.
+Others have special characters: @#%^&*()_+[]{}|;:',.<>?/!
 
+Here is a very long line that should test the buffer size and how well the program handles larger inputs without crashing or truncating the text.
+
+Goodbye!
