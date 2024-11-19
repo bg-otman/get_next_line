@@ -1,4 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: obouizi <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/19 16:00:27 by obouizi           #+#    #+#             */
+/*   Updated: 2024/11/19 16:00:58 by obouizi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
+
+size_t	ft_slen(char const *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s && s[i])
+		i++;
+	return (i);
+}
 
 void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
@@ -23,10 +45,10 @@ char	*ft_strdup(const char *s1)
 {
 	char	*ptr;
 	size_t	i;
-    size_t s_len;
+	size_t	s_len;
 
 	i = 0;
-    s_len = strlen(s1);
+	s_len = strlen(s1);
 	ptr = (char *) malloc(s_len + 1);
 	if (ptr == NULL)
 		return (NULL);
@@ -39,24 +61,14 @@ char	*ft_strdup(const char *s1)
 	return (ptr);
 }
 
-size_t	ft_slen(char const *s)
-{
-	size_t	i;
-
-	i = 0;
-	while (s && s[i])
-		i++;
-	return (i);
-}
-
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*ptr;
 	size_t	s1_len;
 	size_t	s2_len;
-    
+
 	s1_len = ft_slen(s1);
-    s2_len = ft_slen(s2);
+	s2_len = ft_slen(s2);
 	ptr = (char *) malloc((s1_len + s2_len) + 1);
 	if (ptr == NULL)
 		return (NULL);
@@ -66,58 +78,16 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (ptr);
 }
 
-int check_newline(char *buffer)
+int	check_newline(char *buffer)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (buffer[i])
-    {
-        if (buffer[i] == '\n')
-            return (++i);
-        i++;
-    }
-    return (-1);
-}
-
-char *allocate_line(char *buffer)
-{
-    int len;
-    int i;
-    char *ptr;
-
-	if (!buffer)
-		return (NULL);
-    len = check_newline(buffer);
-	if (len == -1)
-		len = ft_slen(buffer);
-    i = 0;
-	ptr = (char *) malloc(len + 1);
-	if (!ptr)
-		return (NULL);
-	while (i < len)
+	i = 0;
+	while (buffer[i])
 	{
-		ptr[i] = buffer[i];
+		if (buffer[i] == '\n')
+			return (++i);
 		i++;
 	}
-	ptr[i] = '\0';
-	return (ptr);
-}
-
-ssize_t read_data(int fd, char **buffer)
-{
-    ssize_t bytes_read;
-	*buffer = (char *) malloc(BUFFER_SIZE + 1);
-	if (!*buffer)
-		return (-1);
-    bytes_read = read(fd, *buffer, BUFFER_SIZE);
-	if (bytes_read == -1)
-	{
-		free(*buffer);
-		*buffer = NULL;
-		return (bytes_read);
-	}
-	(*buffer)[bytes_read] = '\0';
-
-    return (bytes_read);
+	return (-1);
 }

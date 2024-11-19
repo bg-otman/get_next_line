@@ -6,103 +6,120 @@
 /*   By: obouizi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 20:59:24 by obouizi           #+#    #+#             */
-/*   Updated: 2024/11/10 20:59:46 by obouizi          ###   ########.fr       */
+/*   Updated: 2024/11/19 15:43:33 by obouizi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *allocate_and_free(char **buffer)
+char	*allocate_line(char *buffer)
 {
-    char *line;
-    char *temp;
+	int		len;
+	int		i;
+	char	*ptr;
 
-    if (!buffer || !*buffer)
-        return (NULL);
-    line = allocate_line(*buffer);
-    if (!line)
-    {
-        free(*buffer);
-        *buffer = NULL;
-        return (NULL);
-    }
-    temp = ft_strdup(&(*buffer)[ft_slen(line)]);
-    if (!temp)
-    {
-        free(line);
-        free(*buffer);
-        *buffer = NULL;
-        return (NULL);
-    }
-    free(*buffer);
-    *buffer = temp;
-    return (line);
+	if (!buffer)
+		return (NULL);
+	len = check_newline(buffer);
+	if (len == -1)
+		len = ft_slen(buffer);
+	i = 0;
+	ptr = (char *) malloc(len + 1);
+	if (!ptr)
+		return (NULL);
+	while (i < len)
+	{
+		ptr[i] = buffer[i];
+		i++;
+	}
+	ptr[i] = '\0';
+	return (ptr);
 }
 
-char *get_last_line(char **buffer)
+ssize_t	read_data(int fd, char **buffer)
 {
-    char *line;
+	ssize_t	bytes_read;
 
-    if (*buffer && **buffer)
-    {
-        line = ft_strdup(*buffer);
-        free(*buffer);
-        *buffer = NULL;
-        return (line);
-    }
-    free(*buffer);
-    *buffer = NULL;
-    return (NULL);
+	*buffer = (char *) malloc(BUFFER_SIZE + 1);
+	if (!*buffer)
+		return (-1);
+	bytes_read = read(fd, *buffer, BUFFER_SIZE);
+	if (bytes_read == -1)
+	{
+		free(*buffer);
+		*buffer = NULL;
+		return (bytes_read);
+	}
+	(*buffer)[bytes_read] = '\0';
+	return (bytes_read);
 }
 
-char *get_next_line(int fd)
+char	*allocate_and_free(char **buffer)
 {
-    static char *buffer;
-    char *ptr;
-    char *temp;
-    ssize_t bytes_read;
+	char	*line;
+	char	*temp;
 
-    if (fd < 0 || BUFFER_SIZE <= 0)
-        return (NULL);
-    if (!buffer)
-    {
-        bytes_read = read_data(fd, &buffer);
-        if (bytes_read <= 0)
-            return (NULL);
-    }
-    while (check_newline(buffer) == -1)
-    {
-        bytes_read = read_data(fd, &temp);
-        if (bytes_read <= 0)
-            return (get_last_line(&buffer));
-        ptr = ft_strjoin(buffer, temp);
-        free(buffer);
-        free(temp);
-        if (!ptr)
-            return (NULL);
-        buffer = ptr;
-    }
-    return (allocate_and_free(&buffer));
+	if (!buffer || !*buffer)
+		return (NULL);
+	line = allocate_line(*buffer);
+	if (!line)
+	{
+		free(*buffer);
+		*buffer = NULL;
+		return (NULL);
+	}
+	temp = ft_strdup(&(*buffer)[ft_slen(line)]);
+	if (!temp)
+	{
+		free(line);
+		free(*buffer);
+		*buffer = NULL;
+		return (NULL);
+	}
+	free(*buffer);
+	*buffer = temp;
+	return (line);
 }
 
-int main(void)
+char	*get_last_line(char **buffer)
 {
-    int fd = open("tst.txt", O_RDONLY);
-    char *line;
+	char	*line;
 
-    if (fd == -1)
-    {
-        printf("Error opening file");
-        return (1);
-    }
+	if (*buffer && **buffer)
+	{
+		line = ft_strdup(*buffer);
+		free(*buffer);
+		*buffer = NULL;
+		return (line);
+	}
+	free(*buffer);
+	*buffer = NULL;
+	return (NULL);
+}
 
-    while ((line = get_next_line(fd)) != NULL)
-    {
-        printf("%s", line);
-        free(line);
-    }
-    printf("|%s|", get_next_line(fd));
+char	*get_next_line(int fd)
+{
+	static char	*buffer;
+	char		*ptr;
+	char		*temp;
 
-    close(fd);
-    return (0);
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	if (!buffer)
+	{
+		if (read_data(fd, &buffer) <= 0)
+			return (NULL);
+	}
+	while (check_newline(buffer) == -1)
+	{
+		if (read_data(fd, &temp) <= 0)
+			return (get_last_line(&buffer));
+		ptr = ft_strjoin(buffer, temp);
+		free(buffer);
+		free(temp);
+		if (!ptr)
+			return (NULL);
+		buffer = ptr;
+	}
+	return (allocate_and_free(&buffer));
 }
