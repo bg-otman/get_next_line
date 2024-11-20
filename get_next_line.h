@@ -25,7 +25,7 @@ char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strdup(const char *s1);
 size_t	ft_slen(char const *s);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
-char	*get_last_line(char **buffer);
+char	*get_last_line(char **buffer, ssize_t bytes_read);
 char	*allocate_line(char *buffer);
 int		check_newline(char *buffer);
 ssize_t	read_data(int fd, char **buffer);

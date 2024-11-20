@@ -44,7 +44,7 @@ ssize_t	read_data(int fd, char **buffer)
 	if (!*buffer)
 		return (-1);
 	bytes_read = read(fd, *buffer, BUFFER_SIZE);
-	if (bytes_read == -1 || bytes_read == 0)
+	if (bytes_read <= 0)
 	{
 		free(*buffer);
 		*buffer = NULL;
@@ -81,10 +81,16 @@ char	*allocate_and_free(char **buffer)
 	return (line);
 }
 
-char	*get_last_line(char **buffer)
+char	*get_last_line(char **buffer, ssize_t bytes_read)
 {
 	char	*line;
 
+	if (bytes_read == -1)
+	{
+		free(*buffer);
+		*buffer = NULL;
+		return (NULL);
+	}
 	if (*buffer && **buffer)
 	{
 		line = ft_strdup(*buffer);
@@ -102,6 +108,7 @@ char	*get_next_line(int fd)
 	static char	*buffer;
 	char		*ptr;
 	char		*temp;
+	ssize_t		byte_read;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
@@ -112,8 +119,9 @@ char	*get_next_line(int fd)
 	}
 	while (check_newline(buffer) == -1)
 	{
-		if (read_data(fd, &temp) <= 0)
-			return (get_last_line(&buffer));
+		byte_read = read_data(fd, &temp);
+		if (byte_read <= 0)
+			return (get_last_line(&buffer, byte_read));
 		ptr = ft_strjoin(buffer, temp);
 		free(buffer);
 		free(temp);
