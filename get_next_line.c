@@ -44,7 +44,7 @@ ssize_t	read_data(int fd, char **buffer)
 	if (!*buffer)
 		return (-1);
 	bytes_read = read(fd, *buffer, BUFFER_SIZE);
-	if (bytes_read == -1)
+	if (bytes_read == -1 || bytes_read == 0)
 	{
 		free(*buffer);
 		*buffer = NULL;
