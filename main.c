@@ -16,7 +16,7 @@ int main()
 		free(line);
 		line = NULL;
 	}
-	// printf("|%s|", line);
+	printf("|%s|", line);
 	close(fd);
 	return 0;
 }
