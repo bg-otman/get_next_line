@@ -6,7 +6,7 @@
 /*   By: obouizi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:21:31 by obouizi           #+#    #+#             */
-/*   Updated: 2024/11/20 15:22:01 by obouizi          ###   ########.fr       */
+/*   Updated: 2024/11/21 17:36:16 by obouizi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ char	*get_last_line(char **buffer, ssize_t bytes_read)
 	*buffer = NULL;
 	return (NULL);
 }
-#include <limits.h>
+
 char	*get_next_line(int fd)
 {
 	static char	*buffer[OPEN_MAX];
@@ -110,7 +110,7 @@ char	*get_next_line(int fd)
 	char		*temp;
 	ssize_t		byte_read;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= OPEN_MAX)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= OPEN_MAX || BUFFER_SIZE >= INT_MAX)
 		return (NULL);
 	if (!buffer[fd])
 	{
@@ -130,45 +130,4 @@ char	*get_next_line(int fd)
 		buffer[fd] = ptr;
 	}
 	return (allocate_and_free(&buffer[fd]));
-}
-
-////
-#include <stdio.h>
-#include "get_next_line_bonus.h"
-#include <fcntl.h>
-int main()
-{
-	int fd1 = open("tst1.txt", O_RDONLY);
-	int fd2 = open("tst2.txt", O_RDONLY);
-	int fd3 = open("tst3.txt", O_RDONLY);
-	if (fd1 < 0 || fd2 < 0 || fd3 < 0)
-	{
-		printf("error");
-		return 1;
-	}
-	// char *line;
-	// while((line = get_next_line(fd)) != NULL)
-	// {
-	// 	printf("%s", line);
-	// 	free(line);
-	// 	line = NULL;
-	// }
-	// //printf("|%s|", line);
-
-	printf("%s", get_next_line(fd1));
-	printf("%s", get_next_line(fd2));
-	printf("%s", get_next_line(fd3));
-	printf("%s", get_next_line(fd1));
-	// printf("%s", get_next_line(fd1));
-	// printf("%s", get_next_line(fd1));
-	// printf("%s", get_next_line(fd1));
-	// printf("%s", get_next_line(fd1));
-	// printf("%s", get_next_line(fd1));
-	// printf("%s", get_next_line(fd1));
-
-
-	close(fd1);
-	close(fd2);
-	close(fd3);
-	return 0;
 }

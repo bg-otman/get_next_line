@@ -1,4 +1,0 @@
-hello world
-welcome
-
-end of file 2

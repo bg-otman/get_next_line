@@ -110,7 +110,7 @@ char	*get_next_line(int fd)
 	char		*temp;
 	ssize_t		byte_read;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || BUFFER_SIZE >= INT_MAX)
 		return (NULL);
 	if (!buffer)
 	{
