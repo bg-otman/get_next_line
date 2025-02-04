@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: obouizi <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: obouizi <obouizi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 20:59:24 by obouizi           #+#    #+#             */
-/*   Updated: 2024/11/19 15:43:33 by obouizi          ###   ########.fr       */
+/*   Updated: 2025/01/24 10:21:23 by obouizi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,15 @@ ssize_t	read_data(int fd, char **buffer)
 {
 	ssize_t	bytes_read;
 
+	if (fd < 0)
+	{
+		if (*buffer)
+		{
+			free(*buffer);
+			*buffer = NULL;
+			return (-1);
+		}
+	}
 	*buffer = (char *) malloc(BUFFER_SIZE + 1);
 	if (!*buffer)
 		return (-1);
@@ -110,9 +119,9 @@ char	*get_next_line(int fd)
 	char		*temp;
 	ssize_t		byte_read;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || BUFFER_SIZE >= INT_MAX)
+	if (BUFFER_SIZE <= 0 || BUFFER_SIZE >= INT_MAX)
 		return (NULL);
-	if (!buffer)
+	if (!buffer || fd < 0)
 	{
 		if (read_data(fd, &buffer) <= 0)
 			return (NULL);
